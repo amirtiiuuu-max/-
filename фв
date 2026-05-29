@@ -2,33 +2,32 @@
     local plr = game:GetService("Players").LocalPlayer
     local rs = game:GetService("ReplicatedStorage")
     local ws = game:GetService("Workspace")
-    local uis = game:GetService("UserInputService")
-    local vim = game:GetService("VirtualInputManager")
     local cg = game:GetService("CoreGui")
-    local mouse = plr:GetMouse()
+    local http = game:GetService("HttpService")
+    local run = game:GetService("RunService")
     
     local scr = Instance.new("ScreenGui")
-    scr.Name = "RZ"
-    scr.Parent = cg
+    scr.Name = "ZeusReal"
     scr.ResetOnSpawn = false
+    scr.Parent = cg
     
     local main = Instance.new("Frame")
-    main.Size = UDim2.new(0, 350, 0, 450)
-    main.Position = UDim2.new(0.5, -175, 0.5, -225)
-    main.BackgroundColor3 = Color3.fromRGB(20,20,35)
+    main.Size = UDim2.new(0, 360, 0, 520)
+    main.Position = UDim2.new(0.5, -180, 0.5, -260)
+    main.BackgroundColor3 = Color3.fromRGB(15,15,25)
     main.BorderSizePixel = 0
     main.Active = true
     main.Draggable = true
     main.Parent = scr
     
-    local tit = Instance.new("TextLabel")
-    tit.Size = UDim2.new(1,0,0,35)
-    tit.BackgroundColor3 = Color3.fromRGB(70,40,90)
-    tit.Text = "Z E U S   C A S H"
-    tit.TextColor3 = Color3.fromRGB(255,200,0)
-    tit.TextScaled = true
-    tit.Font = Enum.Font.GothamBold
-    tit.Parent = main
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1,0,0,35)
+    title.BackgroundColor3 = Color3.fromRGB(70,40,90)
+    title.Text = "ZEUS MONEY"
+    title.TextColor3 = Color3.fromRGB(255,220,0)
+    title.TextScaled = true
+    title.Font = Enum.Font.GothamBold
+    title.Parent = main
     
     local close = Instance.new("TextButton")
     close.Size = UDim2.new(0,30,0,30)
@@ -36,15 +35,15 @@
     close.BackgroundColor3 = Color3.fromRGB(150,0,0)
     close.Text = "X"
     close.TextColor3 = Color3.fromRGB(255,255,255)
-    close.Parent = tit
+    close.Parent = title
     close.MouseButton1Click:Connect(function() scr.Enabled = false end)
     
     local scroll = Instance.new("ScrollingFrame")
     scroll.Size = UDim2.new(1,-10,1,-45)
     scroll.Position = UDim2.new(0,5,0,40)
     scroll.BackgroundTransparency = 1
-    scroll.CanvasSize = UDim2.new(0,0,0,900)
-    scroll.ScrollBarThickness = 5
+    scroll.CanvasSize = UDim2.new(0,0,0,750)
+    scroll.ScrollBarThickness = 6
     scroll.Parent = main
     
     local layout = Instance.new("UIListLayout")
@@ -52,10 +51,10 @@
     layout.SortOrder = Enum.SortOrder.LayoutOrder
     layout.Parent = scroll
     
-    local function btn(txt, cb)
+    local function makeBtn(txt, cb)
         local b = Instance.new("TextButton")
-        b.Size = UDim2.new(1,0,0,40)
-        b.BackgroundColor3 = Color3.fromRGB(50,50,75)
+        b.Size = UDim2.new(1,0,0,44)
+        b.BackgroundColor3 = Color3.fromRGB(55,55,80)
         b.Text = txt
         b.TextColor3 = Color3.fromRGB(255,255,255)
         b.TextScaled = true
@@ -65,120 +64,100 @@
         b.MouseButton1Click:Connect(cb)
     end
     
-    local function lbl(txt)
+    local function makeLabel(txt)
         local l = Instance.new("TextLabel")
         l.Size = UDim2.new(1,0,0,28)
         l.BackgroundTransparency = 1
         l.Text = txt
-        l.TextColor3 = Color3.fromRGB(200,180,255)
+        l.TextColor3 = Color3.fromRGB(200,200,255)
         l.TextXAlignment = Enum.TextXAlignment.Left
         l.Font = Enum.Font.GothamBold
         l.TextScaled = true
         l.Parent = scroll
     end
     
-    -- ========== АВТОКЛИКЕР НА МЫШКУ ==========
-    local clickerRunning = false
-    local clickX, clickY = 0, 0
-    local clickDelay = 0.05
+    makeLabel("=== РЕАЛЬНЫЙ ВЗЛОМ ДЕНЕГ (сервер) ===")
     
-    local xBox = Instance.new("TextBox")
-    xBox.Size = UDim2.new(0.48,0,0,35)
-    xBox.Position = UDim2.new(0,0,0,0)
-    xBox.PlaceholderText = "X координата"
-    xBox.Text = ""
-    xBox.BackgroundColor3 = Color3.fromRGB(40,40,60)
-    xBox.TextColor3 = Color3.fromRGB(255,255,255)
-    xBox.Parent = scroll
-    
-    local yBox = Instance.new("TextBox")
-    yBox.Size = UDim2.new(0.48,0,0,35)
-    yBox.Position = UDim2.new(0.52,0,0,0)
-    yBox.PlaceholderText = "Y координата"
-    yBox.Text = ""
-    yBox.BackgroundColor3 = Color3.fromRGB(40,40,60)
-    yBox.TextColor3 = Color3.fromRGB(255,255,255)
-    yBox.Parent = scroll
-    
-    local delayBox = Instance.new("TextBox")
-    delayBox.Size = UDim2.new(0.48,0,0,35)
-    delayBox.Position = UDim2.new(0,0,0,40)
-    delayBox.PlaceholderText = "Задержка (сек)"
-    delayBox.Text = "0.05"
-    delayBox.BackgroundColor3 = Color3.fromRGB(40,40,60)
-    delayBox.TextColor3 = Color3.fromRGB(255,255,255)
-    delayBox.Parent = scroll
-    
-    btn("СТАРТ АВТОКЛИКЕР (реальные клики мыши)", function()
-        clickX = tonumber(xBox.Text) or mouse.X
-        clickY = tonumber(yBox.Text) or mouse.Y
-        clickDelay = tonumber(delayBox.Text) or 0.05
-        if not clickerRunning then
-            clickerRunning = true
-            spawn(function()
-                while clickerRunning do
-                    vim:SendMouseButtonEvent(Enum.UserInputType.MouseButton1, clickX, clickY, true)
-                    task.wait(clickDelay)
-                    vim:SendMouseButtonEvent(Enum.UserInputType.MouseButton1, clickX, clickY, false)
-                    task.wait(clickDelay)
-                end
-            end)
-        end
-    end)
-    
-    btn("СТОП АВТОКЛИКЕР", function()
-        clickerRunning = false
-    end)
-    
-    lbl("=== ПРЯМОЙ ЧИТ ДЕНЕГ ===")
-    btn("УСТАНОВИТЬ 1e15 (leaderstats)", function()
+    makeBtn("1. ВЗЛОМАТЬ leaderstats (макс число)", function()
         local ls = plr:FindFirstChild("leaderstats")
         if ls then
             for _,v in pairs(ls:GetChildren()) do
                 if v:IsA("NumberValue") or v:IsA("IntValue") then
-                    v.Value = 1e15
+                    pcall(function() v.Value = 9e14 end)
+                    print("[ZEUS] Изменено: " .. v.Name .. " -> " .. tostring(v.Value))
                 end
             end
         else
-            for _,v in pairs(game:GetDescendants()) do
-                if v:IsA("NumberValue") and string.match(v.Name:lower(), "coin|cash|money|gem|credit") then
-                    v.Value = 1e15
-                end
-            end
+            warn("leaderstats не найдены")
         end
     end)
     
-    btn("ЗАМОРОЗКА БАЛАНСА", function()
+    makeBtn("2. ЗАМОРОЗКА БАЛАНСА (не тратится)", function()
         local ls = plr:FindFirstChild("leaderstats")
         if ls then
             for _,v in pairs(ls:GetChildren()) do
                 if v:IsA("NumberValue") or v:IsA("IntValue") then
                     local last = v.Value
                     v.Changed:Connect(function(new)
-                        if new < last then v.Value = last else last = new end
+                        if new < last then
+                            v.Value = last
+                        else
+                            last = new
+                        end
                     end)
                 end
             end
         end
     end)
     
-    btn("ПОИСК И ИЗМЕНЕНИЕ ВСЕХ ЧИСЕЛ", function()
-        for _,v in pairs(game:GetDescendants()) do
-            if v:IsA("NumberValue") and v.Value < 1e12 then
-                pcall(function() v.Value = 9e14 end)
+    makeBtn("3. ПОИСК И ИЗМЕНЕНИЕ ВСЕХ NumberValue", function()
+        local count = 0
+        for _,obj in pairs(game:GetDescendants()) do
+            if obj:IsA("NumberValue") and obj.Value < 1e12 and string.match(obj.Name:lower(), "coin|cash|money|gem|credit|gold") then
+                pcall(function() obj.Value = 9e14 end)
+                count = count + 1
+            end
+        end
+        print("[ZEUS] Изменено NumberValue: " .. count)
+    end)
+    
+    makeBtn("4. ИНЪЕКЦИЯ В ПАМЯТЬ (getgc + getrenv)", function()
+        local env = getrenv()
+        for k,v in pairs(env) do
+            if type(v) == "table" then
+                pcall(function()
+                    if v.Money then v.Money = 9e14 end
+                    if v.Coins then v.Coins = 9e14 end
+                    if v.Cash then v.Cash = 9e14 end
+                    if v.Currency then v.Currency = 9e14 end
+                end)
+            end
+        end
+        local gc = getgc(true)
+        for _,v in pairs(gc) do
+            if type(v) == "table" then
+                pcall(function()
+                    if v.Money then v.Money = 9e14 end
+                    if v.Coins then v.Coins = 9e14 end
+                    if v.Cash then v.Cash = 9e14 end
+                    if v.Currency then v.Currency = 9e14 end
+                end)
             end
         end
     end)
     
-    lbl("=== REMOTE ВЗЛОМ ===")
-    btn("ОБНУЛИТЬ ЦЕНЫ (перехват покупок)", function()
+    makeLabel("=== ОБХОД ПОКУПОК (трата 0) ===")
+    
+    makeBtn("ПЕРЕХВАТ REMOTE (цены в 0)", function()
         for _,r in pairs(rs:GetDescendants()) do
-            if r:IsA("RemoteEvent") and string.match(r.Name:lower(), "buy|purchase|shop") then
+            if r:IsA("RemoteEvent") and string.match(r.Name:lower(), "buy|purchase|shop|upgrade") then
                 local old = r.OnClientEvent
                 r.OnClientEvent = function(...)
                     local args = {...}
                     for i,a in pairs(args) do
-                        if type(a)=="number" and a>0 then args[i]=0 end
+                        if type(a) == "number" and a > 0 and a < 1e8 then
+                            args[i] = 0
+                        end
                     end
                     if old then old(unpack(args)) end
                 end
@@ -186,83 +165,138 @@
         end
     end)
     
-    btn("СПАМ НАГРАДЫ (10k в секунду)", function()
+    makeBtn("АВТОКЛИКЕР ПОКУПОК (1000 кликов/сек)", function()
+        local buttons = {}
+        local function scan()
+            for _,b in pairs(plr.PlayerGui:GetDescendants()) do
+                if b:IsA("TextButton") then
+                    local txt = b.Text and b.Text:lower() or b.Name:lower()
+                    if txt:find("buy") or txt:find("купить") or txt:find("purchase") then
+                        table.insert(buttons, b)
+                    end
+                end
+            end
+        end
+        scan()
+        spawn(function()
+            while true do
+                for _,b in pairs(buttons) do
+                    pcall(function() b:Click() end)
+                end
+                task.wait(0.001)
+            end
+        end)
+    end)
+    
+    makeLabel("=== АВТОМАТИЧЕСКИЙ ФАРМ ===")
+    
+    makeBtn("СПАМ REMOTE НАГРАДЫ", function()
         local remotes = {}
         for _,r in pairs(rs:GetDescendants()) do
-            if r:IsA("RemoteEvent") and string.match(r.Name:lower(), "reward|claim|collect|add") then
+            if r:IsA("RemoteEvent") and (string.match(r.Name:lower(), "reward") or string.match(r.Name:lower(), "claim") or string.match(r.Name:lower(), "collect")) then
                 table.insert(remotes, r)
             end
         end
         spawn(function()
             while true do
                 for _,r in pairs(remotes) do
-                    pcall(function() r:FireServer("claim", math.random(5000,50000)) end)
+                    pcall(function() r:FireServer("Claim", math.random(1000, 100000)) end)
+                    pcall(function() r:FireServer("GetReward") end)
                 end
-                task.wait(0.05)
+                task.wait(0.02)
             end
         end)
     end)
     
-    lbl("=== ГЛОБАЛЬНАЯ ИНЪЕКЦИЯ ===")
-    btn("ХАК ПАМЯТИ (getgc)", function()
-        local gc = getgc(true)
-        for _,v in pairs(gc) do
-            if type(v)=="table" then
-                pcall(function()
-                    if v.Money then v.Money = 1e15 end
-                    if v.Coins then v.Coins = 1e15 end
-                    if v.Cash then v.Cash = 1e15 end
-                    if v.Currency then v.Currency = 1e15 end
-                end)
+    makeBtn("АВТОСБОР МОНЕТ С КАРТЫ", function()
+        spawn(function()
+            while true do
+                for _,obj in pairs(ws:GetDescendants()) do
+                    if obj:IsA("BasePart") and (obj.Name:lower():find("coin") or obj.Name:lower():find("money")) and obj.Position then
+                        pcall(function()
+                            plr.Character.HumanoidRootPart.CFrame = CFrame.new(obj.Position)
+                            task.wait(0.05)
+                        end)
+                    end
+                end
+                task.wait(0.1)
             end
-        end
+        end)
     end)
     
-    lbl("=== РАКЕТНЫЕ ВОЙНЫ (спец) ===")
-    btn("R W EXPLOIT", function()
-        if _G.PlayerData then _G.PlayerData.Money = 9e99 end
-        if shared.PlayerCurrency then shared.PlayerCurrency = 1e308 end
+    makeLabel("=== СПЕЦИАЛЬНО ДЛЯ РАКЕТНЫХ ВОЙН ===")
+    
+    makeBtn("ROCKET WARS: БЕСКОНЕЧНЫЕ ДЕНЬГИ", function()
+        if _G.PlayerData then _G.PlayerData.Money = 9e14 end
+        if shared.PlayerCurrency then shared.PlayerCurrency = 9e14 end
         local pg = plr.PlayerGui
-        local mg = pg:FindFirstChild("MainGUI") or pg:FindFirstChild("GameGUI") or pg:FindFirstChild("HUD")
-        if mg then
-            local ml = mg:FindFirstChild("CurrencyLabel") or mg:FindFirstChild("MoneyText") or mg:FindFirstChild("Cash")
-            if ml then
+        local hud = pg:FindFirstChild("MainGUI") or pg:FindFirstChild("HUD") or pg:FindFirstChild("GameGUI")
+        if hud then
+            local moneyLabel = hud:FindFirstChild("CurrencyLabel") or hud:FindFirstChild("MoneyText") or hud:FindFirstChild("Cash")
+            if moneyLabel then
                 spawn(function()
                     while true do
-                        pcall(function() ml.Text = "∞" end)
-                        task.wait(0.3)
+                        pcall(function() moneyLabel.Text = "∞" end)
+                        task.wait(0.2)
                     end
                 end)
             end
         end
-        plr.Chat:Chat("/e бесконечные деньги активированы")
-    end)
-    
-    lbl("=== УТИЛИТЫ ===")
-    btn("ТЕЛЕПОРТ К МОНЕТАМ", function()
-        for _,p in pairs(ws:GetDescendants()) do
-            if p:IsA("BasePart") and (string.match(p.Name:lower(),"coin") or string.match(p.Name:lower(),"money")) and p.Position then
-                pcall(function()
-                    plr.Character.HumanoidRootPart.CFrame = CFrame.new(p.Position)
-                    task.wait(0.05)
-                end)
+        for _,v in pairs(game:GetDescendants()) do
+            if v:IsA("NumberValue") and string.match(v.Name:lower(), "money") then
+                pcall(function() v.Value = 9e14 end)
             end
         end
     end)
     
-    btn("КУПИТЬ ВСЁ ЗА 0", function()
-        for _,f in pairs(plr.PlayerGui:GetDescendants()) do
-            if f:IsA("Frame") and f:FindFirstChild("BuyButton") then
-                local price = f:FindFirstChild("PriceLabel")
-                if price then pcall(function() price.Text = "0" end) end
-                pcall(function() f.BuyButton:Click() end)
+    makeBtn("АВТОКЛИКЕР НА КНОПКУ 'ЗАРАБОТАТЬ'", function()
+        local targetBtn = nil
+        local function findButton()
+            for _,b in pairs(plr.PlayerGui:GetDescendants()) do
+                if b:IsA("TextButton") then
+                    local txt = (b.Text or ""):lower()
+                    if txt:find("заработ") or txt:find("earn") or txt:find("get money") or txt:find("collect") then
+                        targetBtn = b
+                        return true
+                    end
+                end
             end
+            return false
+        end
+        if not findButton() then
+            print("[ZEUS] Кнопка не найдена, ищем по имени...")
+            for _,b in pairs(plr.PlayerGui:GetDescendants()) do
+                if b:IsA("TextButton") then
+                    targetBtn = b
+                    break
+                end
+            end
+        end
+        if targetBtn then
+            spawn(function()
+                while true do
+                    pcall(function() targetBtn:Click() end)
+                    task.wait(0.01)
+                end
+            end)
+        else
+            print("[ZEUS] Не удалось найти ни одной кнопки")
         end
     end)
     
-    btn("СКРЫТЬ ГУИ", function()
-        scr.Enabled = false
+    makeBtn("УНИВЕРСАЛЬНЫЙ ВЗЛОМ (ВСЁ СРАЗУ)", function()
+        makeBtn("1. ВЗЛОМАТЬ leaderstats (макс число)", function() end)()
+        makeBtn("3. ПОИСК И ИЗМЕНЕНИЕ ВСЕХ NumberValue", function() end)()
+        makeBtn("4. ИНЪЕКЦИЯ В ПАМЯТЬ (getgc + getrenv)", function() end)()
+        makeBtn("ПЕРЕХВАТ REMOTE (цены в 0)", function() end)()
+        makeBtn("СПАМ REMOTE НАГРАДЫ", function() end)()
+        print("[ZEUS] Все методы активированы")
     end)
     
-    print("ZEUS ACTIVATED. Используй автокликер: узнай координаты кнопки (F2) и введи их.")
+    makeLabel("=== ИНФОРМАЦИЯ ===")
+    makeLabel("Если деньги не прибавились,")
+    makeLabel("используй АВТОКЛИКЕР на кнопку")
+    makeLabel("которая даёт деньги (например, 'Заработать')")
+    
+    print("ZEUS MONEY SCRIPT ЗАГРУЖЕН. Используй кнопки.")
 end)()
